@@ -40,6 +40,10 @@ export const OpenAIStream = async (
     temperature: 1,
     // stream: true,
   });
+
+  console.log(`${OPENAI_API_HOST}/chat/completions`);
+  console.log(process.env.OPENAI_API_KEY);
+
   const res = await fetch(`${OPENAI_API_HOST}/chat/completions`, {
     headers: {
       'Content-Type': 'application/json',
