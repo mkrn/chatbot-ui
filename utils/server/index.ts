@@ -52,6 +52,8 @@ export const OpenAIStream = async (
     body: bodystr,
   });
 
+  console.log(bodystr);
+
   const encoder = new TextEncoder();
   const decoder = new TextDecoder();
 
@@ -65,6 +67,7 @@ export const OpenAIStream = async (
         result.error.code,
       );
     } else {
+      console.error(result);
       console.error(result.error);
       throw new Error(
         `OpenAI API returned an error: ${
@@ -77,9 +80,67 @@ export const OpenAIStream = async (
   const responseBody = await res.json();
   const fullText = responseBody.choices[0].message.content;
 
+  console.log(fullText);
+
+  // console.log('Starting stream creation');
+
+  // const stream = new ReadableStream({
+  //   async start(controller) {
+  //     console.log('Stream start initiated');
+
+  //     const onParse = (event: ParsedEvent | ReconnectInterval) => {
+  //       console.log('Parsing event:', event.type);
+
+  //       if (event.type === 'event') {
+  //         const data = event.data;
+  //         console.log('Received data:', data);
+
+  //         if (data === '[DONE]') {
+  //           console.log('Stream complete');
+  //           controller.close();
+  //           return;
+  //         }
+
+  //         try {
+  //           const json = JSON.parse(data);
+  //           console.log('Parsed JSON:', json);
+
+  //           const text = json.choices[0].delta.content;
+  //           console.log('Extracted text:', text);
+
+  //           const queue = encoder.encode(text);
+  //           console.log('Encoded queue length:', queue.length);
+
+  //           controller.enqueue(queue);
+  //         } catch (e) {
+  //           console.error('Error parsing or processing data:', e);
+  //           controller.error(e);
+  //         }
+  //       }
+  //     };
+
+  //     const parser = createParser(onParse);
+  //     console.log('Parser created');
+
+  //     try {
+  //       for await (const chunk of res.body as any) {
+  //         console.log('Received chunk, length:', chunk.length);
+  //         const decodedChunk = decoder.decode(chunk);
+  //         console.log('Decoded chunk:', decodedChunk);
+  //         parser.feed(decodedChunk);
+  //       }
+  //     } catch (error) {
+  //       console.error('Error processing response body:', error);
+  //     }
+  //   },
+  // });
+
+  // console.log('Stream created, returning');
+  // return stream;
+
   const stream = new ReadableStream({
     async start(controller) {
-      const chunkSize = 5; // Adjust this value to control the streaming speed
+      const chunkSize = 25; // Adjust this value to control the streaming speed
       for (let i = 0; i < fullText.length; i += chunkSize) {
         const chunk = fullText.slice(i, i + chunkSize);
         const queue = encoder.encode(chunk);
