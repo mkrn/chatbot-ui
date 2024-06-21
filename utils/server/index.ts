@@ -27,7 +27,20 @@ export const OpenAIStream = async (
   key: string,
   messages: Message[],
 ) => {
-  const res = await fetch(`${OPENAI_API_HOST}/v1/chat/completions`, {
+  const bodystr = JSON.stringify({
+    model: model.id,
+    messages: [
+      {
+        role: 'system',
+        content: systemPrompt,
+      },
+      ...messages,
+    ],
+    // max_tokens: 1000,
+    temperature: 1,
+    // stream: true,
+  });
+  const res = await fetch(`${OPENAI_API_HOST}/chat/completions`, {
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${key ? key : process.env.OPENAI_API_KEY}`,
@@ -36,19 +49,7 @@ export const OpenAIStream = async (
       }),
     },
     method: 'POST',
-    body: JSON.stringify({
-      model: model.id,
-      messages: [
-        {
-          role: 'system',
-          content: systemPrompt,
-        },
-        ...messages,
-      ],
-      max_tokens: 1000,
-      temperature: 1,
-      stream: true,
-    }),
+    body: bodystr,
   });
 
   const encoder = new TextEncoder();
@@ -64,6 +65,7 @@ export const OpenAIStream = async (
         result.error.code,
       );
     } else {
+      console.error(result.error);
       throw new Error(
         `OpenAI API returned an error: ${
           decoder.decode(result?.value) || result.statusText
@@ -72,33 +74,19 @@ export const OpenAIStream = async (
     }
   }
 
+  const responseBody = await res.json();
+  const fullText = responseBody.choices[0].message.content;
+
   const stream = new ReadableStream({
     async start(controller) {
-      const onParse = (event: ParsedEvent | ReconnectInterval) => {
-        if (event.type === 'event') {
-          const data = event.data;
-
-          if (data === '[DONE]') {
-            controller.close();
-            return;
-          }
-
-          try {
-            const json = JSON.parse(data);
-            const text = json.choices[0].delta.content;
-            const queue = encoder.encode(text);
-            controller.enqueue(queue);
-          } catch (e) {
-            controller.error(e);
-          }
-        }
-      };
-
-      const parser = createParser(onParse);
-
-      for await (const chunk of res.body as any) {
-        parser.feed(decoder.decode(chunk));
+      const chunkSize = 5; // Adjust this value to control the streaming speed
+      for (let i = 0; i < fullText.length; i += chunkSize) {
+        const chunk = fullText.slice(i, i + chunkSize);
+        const queue = encoder.encode(chunk);
+        controller.enqueue(queue);
+        await new Promise((resolve) => setTimeout(resolve, 50)); // Adjust delay as needed
       }
+      controller.close();
     },
   });
 
