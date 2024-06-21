@@ -9,13 +9,17 @@ export default function Document(props: Props) {
   const currentLocale =
     props.__NEXT_DATA__.locale ?? i18nextConfig.i18n.defaultLocale;
   return (
+    // @ts-ignore
     <Html lang={currentLocale}>
+      {/* @ts-ignore */}
       <Head>
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-title" content="Chatbot UI"></meta>
       </Head>
       <body>
+        {/* @ts-ignore */}
         <Main />
+        {/* @ts-ignore */}
         <NextScript />
       </body>
     </Html>
