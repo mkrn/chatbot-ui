@@ -34,13 +34,12 @@ export const OpenAIStream = async (
         role: 'system',
         content: systemPrompt,
       },
-      ...messages,
+      ...messages.filter((message) => message.role !== 'assistant'),
     ],
     // max_tokens: 1000,
     temperature: 1,
     // stream: true,
   });
-
   console.log(`${OPENAI_API_HOST}/chat/completions`);
   console.log(process.env.OPENAI_API_KEY);
 
