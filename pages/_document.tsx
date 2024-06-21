@@ -14,7 +14,7 @@ export default function Document(props: Props) {
       {/* @ts-ignore */}
       <Head>
         <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-title" content="Chatbot UI"></meta>
+        <meta name="apple-mobile-web-app-title" content="WiseBuddy"></meta>
       </Head>
       <body>
         {/* @ts-ignore */}
