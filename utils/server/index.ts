@@ -133,27 +133,35 @@ export const OpenAIStream = async (
   // });
   const stream = new ReadableStream({
     async start(controller) {
+      console.log('Stream start initiated');
       try {
         for await (const chunk of res.body as any) {
+          console.log('Received chunk, length:', chunk.length);
           const decodedChunk = decoder.decode(chunk);
+          console.log('Decoded chunk:', decodedChunk);
 
           try {
             const json = JSON.parse(decodedChunk);
+            console.log('Parsed JSON:', json);
 
             if (json.choices && json.choices.length > 0) {
               const text = json.choices[0].delta.content;
+              console.log('Extracted text:', text);
 
               if (text) {
                 const queue = encoder.encode(text);
+                console.log('Encoded queue length:', queue.length);
                 controller.enqueue(queue);
               }
             }
 
             if (json.choices[0].finish_reason === 'stop') {
+              console.log('Stream complete');
               controller.close();
               return;
             }
           } catch (e) {
+            console.error('Error parsing or processing data:', e);
             controller.error(e);
           }
         }
