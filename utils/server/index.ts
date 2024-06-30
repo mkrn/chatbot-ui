@@ -34,11 +34,11 @@ export const OpenAIStream = async (
         role: 'system',
         content: systemPrompt,
       },
-      ...messages.filter((message) => message.role !== 'assistant'),
+      messages[messages.length - 1],
     ],
     // max_tokens: 1000,
     temperature: 1,
-    // stream: true,
+    stream: true,
   });
   console.log(`${OPENAI_API_HOST}/chat/completions`);
   console.log(process.env.OPENAI_API_KEY);
@@ -80,13 +80,6 @@ export const OpenAIStream = async (
     }
   }
 
-  const responseBody = await res.json();
-  const fullText = responseBody.choices[0].message.content;
-
-  console.log(fullText);
-
-  // console.log('Starting stream creation');
-
   // const stream = new ReadableStream({
   //   async start(controller) {
   //     console.log('Stream start initiated');
@@ -105,6 +98,7 @@ export const OpenAIStream = async (
   //         }
 
   //         try {
+  //           console.log(data);
   //           const json = JSON.parse(data);
   //           console.log('Parsed JSON:', json);
 
@@ -137,22 +131,52 @@ export const OpenAIStream = async (
   //     }
   //   },
   // });
-
-  // console.log('Stream created, returning');
-  // return stream;
-
   const stream = new ReadableStream({
     async start(controller) {
-      const chunkSize = 25; // Adjust this value to control the streaming speed
-      for (let i = 0; i < fullText.length; i += chunkSize) {
-        const chunk = fullText.slice(i, i + chunkSize);
-        const queue = encoder.encode(chunk);
-        controller.enqueue(queue);
-        await new Promise((resolve) => setTimeout(resolve, 50)); // Adjust delay as needed
+      try {
+        for await (const chunk of res.body as any) {
+          const decodedChunk = decoder.decode(chunk);
+
+          try {
+            const json = JSON.parse(decodedChunk);
+
+            if (json.choices && json.choices.length > 0) {
+              const text = json.choices[0].delta.content;
+
+              if (text) {
+                const queue = encoder.encode(text);
+                controller.enqueue(queue);
+              }
+            }
+
+            if (json.choices[0].finish_reason === 'stop') {
+              controller.close();
+              return;
+            }
+          } catch (e) {
+            controller.error(e);
+          }
+        }
+      } catch (error) {
+        // Keeping this error log as it might be important for debugging
+        console.error('Error processing response body:', error);
       }
-      controller.close();
     },
   });
 
   return stream;
+  // const stream = new ReadableStream({
+  //   async start(controller) {
+  //     const chunkSize = 25; // Adjust this value to control the streaming speed
+  //     for (let i = 0; i < fullText.length; i += chunkSize) {
+  //       const chunk = fullText.slice(i, i + chunkSize);
+  //       const queue = encoder.encode(chunk);
+  //       controller.enqueue(queue);
+  //       await new Promise((resolve) => setTimeout(resolve, 50)); // Adjust delay as needed
+  //     }
+  //     controller.close();
+  //   },
+  // });
+
+  // return stream;
 };
