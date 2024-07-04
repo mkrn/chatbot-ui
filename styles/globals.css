@@ -41,3 +41,16 @@ html {
 pre:has(div.codeblock) {
   padding: 0;
 }
+
+.messageStreaming p {
+  animation: fadeIn 1s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

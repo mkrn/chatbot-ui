@@ -294,6 +294,11 @@ export const Chat: FC<Props> = memo(
                       message={message}
                       messageIndex={index}
                       onEditMessage={onEditMessage}
+                      messageIsStreaming={
+                        index === conversation.messages.length - 1
+                          ? messageIsStreaming
+                          : false
+                      }
                     />
                   ))}
 
