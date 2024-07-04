@@ -308,9 +308,7 @@ export const ChatInput: FC<Props> = ({
                   : 'hidden'
               }`,
             }}
-            placeholder={
-              t('Type a message or type "/" to select a prompt...') || ''
-            }
+            placeholder={t('Type your question...') || ''}
             value={content}
             rows={1}
             onCompositionStart={() => setIsTyping(true)}
@@ -351,9 +349,6 @@ export const ChatInput: FC<Props> = ({
             />
           )}
         </div>
-      </div>
-      <div className="px-3 pb-3 pt-2 text-center text-[12px] text-black/50 dark:text-white/50 md:px-4 md:pb-6 md:pt-3">
-        {t('WiseBuddy is a new type of chatbot that hallucinates a lot less')}
       </div>
     </div>
   );

@@ -157,7 +157,10 @@ export const Chat: FC<Props> = memo(
         {!(apiKey || serverSideApiKeyIsSet) ? (
           <div className="mx-auto flex h-full w-[300px] flex-col justify-center space-y-6 sm:w-[600px]">
             <div className="text-center text-4xl font-bold text-black dark:text-white">
-              Welcome to WiseBuddy
+              Uncover the truth, untainted by bias or misinformation.
+              TruthTalker, your trusted metacognitive AI partner, detects and
+              corrects AI hallucinations, ensuring accurate and reliable
+              insights to fuel informed decision-making.
             </div>
             <div className="text-center text-lg text-black dark:text-white">
               <div className="mb-8">{`WiseBuddy is an open source clone of OpenAI's ChatGPT UI.`}</div>
@@ -212,7 +215,7 @@ export const Chat: FC<Props> = memo(
                           <Spinner size="16px" className="mx-auto" />
                         </div>
                       ) : (
-                        'WiseBuddy'
+                        'WiseBuddy.ai'
                       )}
                     </div>
 
@@ -240,7 +243,11 @@ export const Chat: FC<Props> = memo(
                             })
                           }
                         /> */}
-                        Welcome to WiseBuddy
+                        Uncover the truth, untainted by bias or misinformation.
+                        Wise Buddy, your trusted metacognitive AI partner,
+                        detects and corrects AI hallucinations, ensuring
+                        accurate and reliable insights to fuel informed
+                        decision-making.
                       </div>
                     )}
                   </div>
