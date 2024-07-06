@@ -5,7 +5,7 @@ import { OpenAIModel, OpenAIModelID } from '@/types/openai';
 import { Plugin } from '@/types/plugin';
 import { Prompt } from '@/types/prompt';
 import { throttle } from '@/utils';
-import { IconArrowDown, IconClearAll, IconSettings } from '@tabler/icons-react';
+import { IconArrowDown, IconTrashX, IconSettings } from '@tabler/icons-react';
 import { useTranslation } from 'next-i18next';
 import {
   FC,
@@ -255,19 +255,12 @@ export const Chat: FC<Props> = memo(
               ) : (
                 <>
                   <div className="flex justify-center border border-b-neutral-300 bg-neutral-100 py-2 text-sm text-neutral-500 dark:border-none dark:bg-[#444654] dark:text-neutral-200">
-                    {/* {t('Model')}: {conversation.model.name} */}
-                    WiseBuddy
-                    {/* <button
-                      className="ml-2 cursor-pointer hover:opacity-50"
-                      onClick={handleSettings}
-                    >
-                      <IconSettings size={18} />
-                    </button> */}
                     <button
-                      className="ml-2 cursor-pointer hover:opacity-50"
+                      className="ml-2 flex cursor-pointer items-center hover:opacity-50"
                       onClick={onClearAll}
                     >
-                      <IconClearAll size={18} />
+                      <span className="mr-2">Clear conversation</span>
+                      <IconTrashX size={18} />
                     </button>
                   </div>
                   {showSettings && (
