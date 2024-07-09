@@ -17,6 +17,22 @@ const OPENAI_API_HOST = process.env.OPENAI_API_HOST;
 bot.on('message:text', async (ctx) => {
   console.log('message text', ctx.message.text);
 
+  console.log(
+    JSON.stringify({
+      model: 'meta-llama-3-70b-instruct',
+      messages: [
+        {
+          role: 'system',
+          content: '',
+        },
+        ctx.message.text,
+      ],
+      // max_tokens: 1000,
+      temperature: 1,
+      stream: false,
+    }),
+  );
+
   const res = await fetch(`${OPENAI_API_HOST}/chat/completions`, {
     headers: {
       'Content-Type': 'application/json',
@@ -25,7 +41,13 @@ bot.on('message:text', async (ctx) => {
     method: 'POST',
     body: JSON.stringify({
       model: 'meta-llama-3-70b-instruct',
-      messages: [ctx.message.text],
+      messages: [
+        {
+          role: 'system',
+          content: '',
+        },
+        ctx.message.text,
+      ],
       // max_tokens: 1000,
       temperature: 1,
       stream: false,
