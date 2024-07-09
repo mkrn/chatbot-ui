@@ -20,7 +20,7 @@ bot.on('message:text', async (ctx) => {
   const res = await fetch(`${OPENAI_API_HOST}/chat/completions`, {
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${key ? key : process.env.OPENAI_API_KEY}`,
+      Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
     },
     method: 'POST',
     body: JSON.stringify({
