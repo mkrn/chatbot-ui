@@ -7,6 +7,10 @@ export const config = { runtime: 'edge' };
 export default async function handler(req) {
   console.log('webhook call', req, secretToken);
 
+  // Log all searchParams
+  const url = new URL(req.url);
+  console.log('Search Params:', Object.fromEntries(url.searchParams));
+
   if (req.method === 'POST') {
     const callback = webhookCallback(bot, 'std/http', {
       timeoutMilliseconds: 24_000,
