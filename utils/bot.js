@@ -51,9 +51,7 @@ bot.on('message:text', async (ctx) => {
           content: ctx.message.text,
         },
       ],
-      // max_tokens: 1000,
       temperature: 1,
-      stream: false,
     }),
   });
 
