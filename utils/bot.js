@@ -14,6 +14,7 @@ export const bot = new Bot(token);
 // Reply with link to mini app when user sends a message
 bot.on('message:text', (ctx) => {
   console.log('message text', ctx);
+
   //   const keyboard = new InlineKeyboard().game('Start Mini App');
   //   ctx.replyWithGame('my_mini_app', { reply_markup: keyboard });
   ctx.reply('Hi!');
