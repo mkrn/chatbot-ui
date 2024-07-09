@@ -46,7 +46,10 @@ bot.on('message:text', async (ctx) => {
           role: 'system',
           content: '',
         },
-        ctx.message.text,
+        {
+          role: 'user',
+          content: ctx.message.text,
+        },
       ],
       // max_tokens: 1000,
       temperature: 1,
