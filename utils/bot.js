@@ -58,7 +58,6 @@ bot.on('message:text', async (ctx) => {
   const data = await res.json();
   console.log('data', data);
 
-  //   const keyboard = new InlineKeyboard().game('Start Mini App');
-  //   ctx.replyWithGame('my_mini_app', { reply_markup: keyboard });
+  ctx.api.sendChatAction(ctx.chat.id, 'typing');
   ctx.reply(data.choices[0].message.content);
 });
