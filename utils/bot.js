@@ -11,6 +11,8 @@ export const {
 // Default grammY bot instance
 export const bot = new Bot(token);
 
+const OPENAI_API_HOST = process.env.OPENAI_API_HOST;
+
 // Reply with link to mini app when user sends a message
 bot.on('message:text', async (ctx) => {
   console.log('message text', ctx.message.text);
