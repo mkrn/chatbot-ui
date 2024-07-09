@@ -59,5 +59,7 @@ bot.on('message:text', async (ctx) => {
   const data = await res.json();
   console.log('data', data);
 
-  ctx.reply(data.choices[0].message.content);
+  const r = await ctx.reply(data.choices[0].message.content);
+
+  console.log(r);
 });
