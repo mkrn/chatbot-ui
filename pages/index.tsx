@@ -819,7 +819,7 @@ const Home: React.FC<HomeProps> = ({
               />
             </div>
 
-            {showPromptbar ? (
+            {/* {showPromptbar ? (
               <div>
                 <Promptbar
                   prompts={prompts}
@@ -849,7 +849,7 @@ const Home: React.FC<HomeProps> = ({
               >
                 <IconArrowBarLeft />
               </button>
-            )}
+            )} */}
           </div>
         </main>
       )}
