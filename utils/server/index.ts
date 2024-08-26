@@ -5,7 +5,7 @@ import {
   ParsedEvent,
   ReconnectInterval,
 } from 'eventsource-parser';
-import { OPENAI_API_HOST } from '../app/const';
+import { OPENAI_API_HOST, OPENAI_COMPLETIONS_URL } from '../app/const';
 
 export class OpenAIError extends Error {
   type: string;
@@ -30,20 +30,20 @@ export const OpenAIStream = async (
   const bodystr = JSON.stringify({
     model: model.id,
     messages: [
-      {
-        role: 'system',
-        content: systemPrompt,
-      },
-      messages[messages.length - 1],
+      // {
+      //   role: 'system',
+      //   content: systemPrompt,
+      // },
+      ...messages,
+      // messages[messages.length - 1],
     ],
     // max_tokens: 1000,
-    temperature: 1,
-    stream: true,
+    // temperature: 1,
+    // stream: true,
   });
-  console.log(`${OPENAI_API_HOST}/chat/completions`);
-  console.log(process.env.OPENAI_API_KEY);
+  console.log(`${OPENAI_COMPLETIONS_URL}`);
 
-  const res = await fetch(`${OPENAI_API_HOST}/chat/completions`, {
+  const res = await fetch(`${OPENAI_COMPLETIONS_URL}`, {
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${key ? key : process.env.OPENAI_API_KEY}`,
@@ -133,14 +133,10 @@ export const OpenAIStream = async (
   // });
   const stream = new ReadableStream({
     async start(controller) {
-      // console.log('Stream start initiated');
       let buffer = '';
       try {
         for await (const chunk of res.body as any) {
-          // console.log('Received chunk, length:', chunk.length);
           const decodedChunk = decoder.decode(chunk);
-          // console.log('Decoded chunk:', decodedChunk);
-
           buffer += decodedChunk;
           let ndjsonStart = 0;
           let ndjsonEnd = buffer.indexOf('\n', ndjsonStart);
@@ -148,28 +144,32 @@ export const OpenAIStream = async (
           while (ndjsonEnd !== -1) {
             const jsonString = buffer.slice(ndjsonStart, ndjsonEnd).trim();
             if (jsonString) {
-              try {
-                const json = JSON.parse(jsonString);
-                // console.log('Parsed JSON:', json);
+              if (jsonString === 'data: [DONE]') {
+                controller.close();
+                return;
+              }
 
-                if (json.choices && json.choices.length > 0) {
-                  const text = json.choices[0].delta?.content || '';
-                  // console.log('Extracted text:', text);
+              if (jsonString.startsWith('data: ')) {
+                const dataString = jsonString.slice(6);
+                try {
+                  const json = JSON.parse(dataString);
 
-                  if (text) {
-                    const queue = encoder.encode(text);
-                    // console.log('Encoded queue length:', queue.length);
-                    controller.enqueue(queue);
+                  if (json.choices && json.choices.length > 0) {
+                    const text = json.choices[0].delta?.content || '';
+
+                    if (text) {
+                      const queue = encoder.encode(text);
+                      controller.enqueue(queue);
+                    }
+
+                    if (json.choices[0].finish_reason === 'stop') {
+                      controller.close();
+                      return;
+                    }
                   }
-
-                  if (json.choices[0].finish_reason === 'stop') {
-                    // console.log('Stream complete');
-                    controller.close();
-                    return;
-                  }
+                } catch (e) {
+                  console.error('Error parsing or processing data:', e);
                 }
-              } catch (e) {
-                console.error('Error parsing or processing data:', e);
               }
             }
             ndjsonStart = ndjsonEnd + 1;
